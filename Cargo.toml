@@ -1,7 +1,8 @@
 [package]
-name = "http-client"
+name = "roar"
 version = "0.1.0"
 authors = ["miyamoen <akihito.biblioteca@gmail.com>"]
 
 [dependencies]
 reqwest = "0.8.4"
+clap = "2.30.0"
