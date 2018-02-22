@@ -1,5 +1,10 @@
 #[macro_use]
 extern crate clap;
+
+#[macro_use]
+extern crate serde_derive;
+extern crate toml;
+
 extern crate reqwest;
 
 use std::io::Read;
@@ -78,15 +83,18 @@ fn main() {
     //
     // let body = resp.text().unwrap();
     // println!["{:?}", body];
+
+    let point = Point { x: 1, y: 2 };
+
+    let serialized = toml::to_string(&point).unwrap();
+    println!("serialized = {}", serialized);
+
+    let deserialized: Point = toml::from_str(&serialized).unwrap();
+    println!("deserialized = {:?}", deserialized);
 }
 
-struct Point<T> {
-    x: T,
-    y: T,
-}
-
-impl<T> Point<T> {
-    fn swap(&mut self) {
-        std::mem::swap(&mut self.x, &mut self.y);
-    }
+#[derive(Serialize, Deserialize, Debug)]
+struct Point {
+    x: i32,
+    y: i32,
 }
