@@ -1,12 +1,10 @@
+mod config;
+
 #[macro_use]
 extern crate clap;
-
+extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
-extern crate toml;
-
-extern crate reqwest;
-
 use std::io::Read;
 use clap::{App, AppSettings, Arg, ArgGroup, SubCommand};
 
@@ -84,17 +82,5 @@ fn main() {
     // let body = resp.text().unwrap();
     // println!["{:?}", body];
 
-    let point = Point { x: 1, y: 2 };
-
-    let serialized = toml::to_string(&point).unwrap();
-    println!("serialized = {}", serialized);
-
-    let deserialized: Point = toml::from_str(&serialized).unwrap();
-    println!("deserialized = {:?}", deserialized);
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Point {
-    x: i32,
-    y: i32,
+    config::print();
 }
