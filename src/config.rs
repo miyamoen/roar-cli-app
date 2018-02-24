@@ -60,18 +60,17 @@ pub fn print() {
     // }
 }
 
-fn get_raw_config<'a>(file: File) -> RawConfig<'a> {
+fn get_raw_config<'a>(file: File) -> Result<RawConfig<'a>, ConfigError> {
     let mut reader = BufReader::new(file);
 
     let mut buf = String::new();
-    let input: Result<String, ConfigError> = match reader.read_to_string(&mut buf) {
-        Ok(_) => Ok(buf),
-        Err(e) => Err(ConfigError::IOError(e)),
-    };
-    println!("中身だよ : {:?}", input);
-    let res: Result<&str, ConfigError> =
-        input.and_then(|raw| toml::from_str(&raw).map_err(|e| ConfigError::ParseError(e)));
+    reader
+        .read_to_string(&mut buf)
+        .map_err(|e| ConfigError::IOError(e))?;
+
+    let res = toml::from_str::<RawConfig>(&buf).map_err(|e| ConfigError::ParseError(e))?;
     println!("res : {:?}", res);
+
     unimplemented!()
 }
 
