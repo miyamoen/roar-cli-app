@@ -7,7 +7,7 @@ use std::io;
 use std::env;
 pub fn print() {
     let config = RawConfig {
-        host: "localhost:3009/roar/",
+        host: "localhost:3009/roar/".to_string(),
     };
 
     let serialized = toml::to_string(&config).unwrap();
@@ -60,18 +60,15 @@ pub fn print() {
     // }
 }
 
-fn get_raw_config<'a>(file: File) -> Result<RawConfig<'a>, ConfigError> {
-    let mut reader = BufReader::new(file);
-
+fn get_raw_config(file: File) -> Result<RawConfig, ConfigError> {
     let mut buf = String::new();
-    reader
+    BufReader::new(file)
         .read_to_string(&mut buf)
         .map_err(|e| ConfigError::IOError(e))?;
 
     let res = toml::from_str::<RawConfig>(&buf).map_err(|e| ConfigError::ParseError(e))?;
     println!("res : {:?}", res);
-
-    unimplemented!()
+    Ok(res)
 }
 
 #[derive(Debug)]
@@ -81,8 +78,8 @@ enum ConfigError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct RawConfig<'a> {
-    host: &'a str,
+struct RawConfig {
+    host: String,
 }
 
 struct Config<'a> {
