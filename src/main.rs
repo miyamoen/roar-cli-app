@@ -82,5 +82,5 @@ fn main() {
     // let body = resp.text().unwrap();
     // println!["{:?}", body];
 
-    config::print();
+    let config = config::read();
 }
