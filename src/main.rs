@@ -11,10 +11,6 @@ use app::Cmd;
 use app::ConfigCmd;
 
 fn main() {
-    // let mut resp = reqwest::get("https://www.rust-lang.org").unwrap();
-    //
-    // let body = resp.text().unwrap();
-    // println!["{:?}", body];
     let cmd = app::create_command();
     let res = run(cmd);
     println!("result : {:?}", res);
@@ -27,6 +23,13 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
             let config = config::read().map_err(|err| CliError::Config(err))?;
             println!("Show configuration");
             println!("{:?}", config);
+        }
+        Cmd::List => {
+            let config = config::read().map_err(|err| CliError::Config(err))?;
+            let mut resp = reqwest::get("https://www.rust-lang.org")?;
+
+            let body = resp.text().unwrap();
+            println!["{:?}", body];
         }
     };
     Ok(())
