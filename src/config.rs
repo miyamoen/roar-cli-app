@@ -24,7 +24,6 @@ pub fn read() -> Result<Config, ConfigError> {
 fn open_file() -> Result<File, io::Error> {
     let mut path = env::home_dir().unwrap();
     path.push(".roar.toml");
-    println!("path : {:?}", path);
     File::open(path)
 }
 
