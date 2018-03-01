@@ -1,5 +1,6 @@
 mod config;
-mod app;
+mod cli;
+mod api;
 
 #[macro_use]
 extern crate clap;
@@ -7,11 +8,11 @@ extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
 
-use app::{AppsCmd, Cmd, ConfigCmd, OverWriting};
+use cli::{AppsCmd, Cmd, ConfigCmd, OverWriting};
 use config::{Config, ConfigError};
 
 fn main() {
-    let cmd = app::create_command();
+    let cmd = cli::create_command();
     let res = run(cmd);
     println!("result : {:?}", res);
 }
@@ -37,12 +38,10 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
         }
         Cmd::Apps(AppsCmd::List) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
-            let mut response =
-                reqwest::get(&(config.host + "feeds")).map_err(|err| CliError::Reqwest(err))?;
-
-            let body = response.text();
-            println!["{:?}", body];
+            let list = api::list(config).map_err(|err| CliError::Reqwest(err))?;
+            println!["{:?}", list];
         }
+        Cmd::Apps(AppsCmd::New) => unimplemented!(),
     };
     Ok(())
 }

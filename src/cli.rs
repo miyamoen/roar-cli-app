@@ -60,4 +60,5 @@ pub enum OverWriting {
 }
 pub enum AppsCmd {
     List,
+    New,
 }
