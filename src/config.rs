@@ -37,6 +37,10 @@ pub fn write(config: Config) -> Result<(), ConfigError> {
         .map_err(|e| ConfigError::IO(e))
 }
 
+pub fn exists() -> bool {
+    config_path().exists()
+}
+
 #[derive(Debug)]
 pub enum ConfigError {
     IO(io::Error),

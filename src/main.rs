@@ -27,7 +27,14 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
         Cmd::Config(ConfigCmd::New(OverWriting::Force)) => {
             config::write(Config::default()).map_err(|err| CliError::Config(err))?
         }
-        Cmd::Config(ConfigCmd::New(OverWriting::NotExists)) => unimplemented!(),
+        Cmd::Config(ConfigCmd::New(OverWriting::NotExists)) => {
+            if config::exists() {
+                println!("Config file has already exsisted.");
+                println!(r#"Use "config new --force" to overwrite config file."#);
+            } else {
+                config::write(Config::default()).map_err(|err| CliError::Config(err))?
+            }
+        }
         Cmd::Apps(AppsCmd::List) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
             let mut response =
