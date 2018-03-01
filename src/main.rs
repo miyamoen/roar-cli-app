@@ -7,7 +7,8 @@ extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
 
-use app::{AppsCmd, Cmd, ConfigCmd};
+use app::{AppsCmd, Cmd, ConfigCmd, OverWriting};
+use config::{Config, ConfigError};
 
 fn main() {
     let cmd = app::create_command();
@@ -23,6 +24,10 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
             println!("Show configuration");
             println!("{:?}", config);
         }
+        Cmd::Config(ConfigCmd::New(OverWriting::Force)) => {
+            config::write(Config::default()).map_err(|err| CliError::Config(err))?
+        }
+        Cmd::Config(ConfigCmd::New(OverWriting::NotExists)) => unimplemented!(),
         Cmd::Apps(AppsCmd::List) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
             let mut response =
@@ -37,6 +42,6 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
 
 #[derive(Debug)]
 enum CliError {
-    Config(config::ConfigError),
+    Config(ConfigError),
     Reqwest(reqwest::Error),
 }
