@@ -7,8 +7,7 @@ extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
 
-use app::Cmd;
-use app::ConfigCmd;
+use app::{AppsCmd, Cmd, ConfigCmd};
 
 fn main() {
     let cmd = app::create_command();
@@ -24,11 +23,12 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
             println!("Show configuration");
             println!("{:?}", config);
         }
-        Cmd::List => {
+        Cmd::Apps(AppsCmd::List) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
-            let mut resp = reqwest::get("https://www.rust-lang.org")?;
+            let mut response =
+                reqwest::get(&(config.host + "feeds")).map_err(|err| CliError::Reqwest(err))?;
 
-            let body = resp.text().unwrap();
+            let body = response.text();
             println!["{:?}", body];
         }
     };
@@ -38,4 +38,5 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
 #[derive(Debug)]
 enum CliError {
     Config(config::ConfigError),
+    Reqwest(reqwest::Error),
 }
