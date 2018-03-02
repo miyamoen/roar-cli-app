@@ -10,6 +10,7 @@ extern crate serde_derive;
 
 use cli::{AppsCmd, Cmd, ConfigCmd, OverWriting};
 use config::{Config, ConfigError};
+use api::AppRequest;
 
 fn main() {
     let cmd = cli::create_command();
@@ -19,11 +20,10 @@ fn main() {
 
 fn run(cmd: Cmd) -> Result<(), CliError> {
     match cmd {
-        Cmd::None(msg) => println!("fail to parse command : {:?}", msg),
+        Cmd::None(msg) => println!("fail to decode a command : {:?}", msg),
         Cmd::Config(ConfigCmd::Show) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
-            println!("Show configuration");
-            println!("{:?}", config);
+            println!("Config : {:?}", config);
         }
         Cmd::Config(ConfigCmd::New(OverWriting::Force)) => {
             config::write(Config::default()).map_err(|err| CliError::Config(err))?
@@ -38,10 +38,16 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
         }
         Cmd::Apps(AppsCmd::List) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
-            let list = api::list(config).map_err(|err| CliError::Reqwest(err))?;
+            let list = api::list(&config).map_err(|err| CliError::Reqwest(err))?;
             println!["{:?}", list];
         }
-        Cmd::Apps(AppsCmd::New) => unimplemented!(),
+        Cmd::Apps(AppsCmd::Create(name)) => {
+            let config = config::read().map_err(|err| CliError::Config(err))?;
+            let app = AppRequest::new(name)
+                .create(&config)
+                .map_err(|err| CliError::Reqwest(err))?;
+            println!("Registered : {:?}", app);
+        }
     };
     Ok(())
 }

@@ -21,7 +21,18 @@ pub fn create_command() -> Cmd {
                 ]),
             SubCommand::with_name("apps")
                 .about("Operate lightning roar apps")
-                .subcommand(SubCommand::with_name("list").about("Show all lightning roar apps")),
+                .subcommands(vec![
+                    SubCommand::with_name("list").about("Show all lightning roar apps"),
+                    SubCommand::with_name("create")
+                        .about("Create lightning roar app")
+                        .arg(
+                            Arg::with_name("name")
+                                .help("App name that you want to register on lightning roar")
+                                .required(true)
+                                .takes_value(true)
+                                .value_name("APP NAME"),
+                        ),
+                ]),
         ]);
 
     match app.get_matches().subcommand() {
@@ -38,6 +49,11 @@ pub fn create_command() -> Cmd {
         },
         ("apps", Some(matches)) => match matches.subcommand() {
             ("list", Some(_)) => Cmd::Apps(AppsCmd::List),
+            ("create", Some(matches)) => {
+                // `name` is a required value. `unwrap` does not panic.
+                let app_name = matches.value_of("name").unwrap();
+                Cmd::Apps(AppsCmd::Create(app_name.to_string()))
+            }
             _ => Cmd::None("invalid apps command!".to_string()),
         },
         _ => Cmd::None("invalid command!".to_string()),
@@ -60,5 +76,5 @@ pub enum OverWriting {
 }
 pub enum AppsCmd {
     List,
-    New,
+    Create(String),
 }
