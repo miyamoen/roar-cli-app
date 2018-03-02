@@ -10,7 +10,7 @@ extern crate serde_derive;
 
 use cli::{AppsCmd, Cmd, ConfigCmd, OverWriting};
 use config::{Config, ConfigError};
-use api::AppRequest;
+use api::{App, AppRequest};
 
 fn main() {
     let cmd = cli::create_command();
@@ -38,7 +38,7 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
         }
         Cmd::Apps(AppsCmd::List) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
-            let list = api::list(&config).map_err(|err| CliError::Reqwest(err))?;
+            let list = App::list(&config).map_err(|err| CliError::Reqwest(err))?;
             println!["{:?}", list];
         }
         Cmd::Apps(AppsCmd::Create(name)) => {

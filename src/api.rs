@@ -3,12 +3,6 @@ extern crate reqwest;
 use config::Config;
 use reqwest::header::Accept;
 
-pub fn list(config: &Config) -> Result<String, reqwest::Error> {
-    let mut response = reqwest::get(&format!("{}feeds", config.host))?;
-    let body = response.text();
-    body
-}
-
 #[serde(rename_all = "camelCase")]
 #[derive(Serialize, Debug)]
 pub struct AppRequest {
@@ -41,4 +35,14 @@ pub struct App {
     id: i32,
     name: String,
     icon_url: String,
+}
+
+impl App {
+    pub fn list(config: &Config) -> Result<Vec<App>, reqwest::Error> {
+        let mut response = reqwest::Client::new()
+            .get(&format!("{}feeds", config.host))
+            .header(Accept::json())
+            .send()?;
+        response.json::<Vec<App>>()
+    }
 }
