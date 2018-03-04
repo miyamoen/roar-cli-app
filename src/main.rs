@@ -4,15 +4,27 @@ mod api;
 
 #[macro_use]
 extern crate clap;
+extern crate console;
 extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
+use std::io::{BufReader, BufWriter, Read, Write};
 
 use cli::{AppsCmd, Cmd, ConfigCmd, OverWriting};
 use config::{Config, ConfigError};
 use api::{App, AppRequest};
 
+use std::thread;
+use std::time::Duration;
+
+use console::Term;
+use console::style;
+
 fn main() {
+    let mut term = Term::stdout();
+    term.write_line(&format!("{}", style("quite").cyan()));
+    thread::sleep(Duration::from_millis(2000));
+    term.clear_last_lines(1);
     let cmd = cli::create_command();
     let res = run(cmd);
     println!("result : {:?}", res);
