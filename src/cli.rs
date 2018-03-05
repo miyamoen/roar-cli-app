@@ -33,6 +33,22 @@ pub fn create_command() -> Cmd {
                                 .value_name("APP NAME"),
                         ),
                 ]),
+            SubCommand::with_name("app")
+                .about("Operate lightning roar app")
+                .arg(
+                    Arg::with_name("app_id")
+                        .help("App id that you want to send entry to on lightning roar")
+                        .required(true)
+                        .takes_value(true)
+                        .value_name("APP ID"),
+                )
+                .arg(
+                    Arg::with_name("title")
+                        .help("Entry title")
+                        .required(true)
+                        .takes_value(true)
+                        .value_name("ENTRY TITLE"),
+                ),
         ]);
 
     match app.get_matches().subcommand() {
@@ -54,8 +70,19 @@ pub fn create_command() -> Cmd {
                 let app_name = matches.value_of("name").unwrap();
                 Cmd::Apps(AppsCmd::Create(app_name.to_string()))
             }
+
+            ("", _) => Cmd::Apps(AppsCmd::List),
             _ => Cmd::None("invalid apps command!".to_string()),
         },
+        ("app", Some(matches)) => {
+            // `app_id` and `title` is a required value. `unwrap` does not panic.
+            let app_id = matches.value_of("app_id").unwrap().parse::<i32>().unwrap();
+            let title = matches.value_of("title").unwrap().to_string();
+            Cmd::App(AppCmd::Send {
+                app_id: app_id,
+                title: title,
+            })
+        }
         _ => Cmd::None("invalid command!".to_string()),
     }
 }
@@ -63,6 +90,7 @@ pub fn create_command() -> Cmd {
 pub enum Cmd {
     Config(ConfigCmd),
     Apps(AppsCmd),
+    App(AppCmd),
     None(String),
 }
 
@@ -70,11 +98,17 @@ pub enum ConfigCmd {
     Show,
     New(OverWriting),
 }
+
 pub enum OverWriting {
     Force,
     NotExists,
 }
+
 pub enum AppsCmd {
     List,
     Create(String),
+}
+
+pub enum AppCmd {
+    Send { app_id: i32, title: String },
 }
