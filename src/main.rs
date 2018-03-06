@@ -48,7 +48,7 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
                 .map_err(|err| CliError::Reqwest(err))?;
             println!("Registered : {:?}", app);
         }
-        Cmd::App(AppCmd::Send { app_id, title }) => {
+        Cmd::App(AppCmd::Send { app_id, title, n }) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
             let status = EntryRequest::new(app_id, title)
                 .send(&config)

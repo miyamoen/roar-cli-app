@@ -48,6 +48,13 @@ pub fn create_command() -> Cmd {
                         .required(true)
                         .takes_value(true)
                         .value_name("ENTRY TITLE"),
+                )
+                .arg(
+                    Arg::with_name("n")
+                        .help("Send n messages")
+                        .short("n")
+                        .takes_value(true)
+                        .value_name("N"),
                 ),
         ]);
 
@@ -78,9 +85,14 @@ pub fn create_command() -> Cmd {
             // `app_id` and `title` is a required value. `unwrap` does not panic.
             let app_id = matches.value_of("app_id").unwrap().parse::<i32>().unwrap();
             let title = matches.value_of("title").unwrap().to_string();
+            let n = matches
+                .value_of("n")
+                .map(|str| str.parse::<i32>().unwrap())
+                .unwrap_or(1);
             Cmd::App(AppCmd::Send {
                 app_id: app_id,
                 title: title,
+                n: n,
             })
         }
         _ => Cmd::None("invalid command!".to_string()),
@@ -110,5 +122,5 @@ pub enum AppsCmd {
 }
 
 pub enum AppCmd {
-    Send { app_id: i32, title: String },
+    Send { app_id: i32, title: String, n: i32 },
 }
