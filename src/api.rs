@@ -63,25 +63,19 @@ impl EntryRequest {
         Self {
             app_id: app_id,
             title: title,
-            summary: "LIPSUM".to_string(),
+            summary: LIPSUM.to_string(),
             link: DUMMY_LINK.to_string(),
             updated: "2012-04-23T18:25:43.511Z".to_string(),
         }
     }
 
-    pub fn send(&self, config: &Config) -> Result<(), reqwest::Error> {
-        let test = serde_json::ser::to_string(&vec![self]);
-        println!("test {:?}", test);
-        println!("url : {}feed/{}", config.host, self.app_id);
-        let mut response = reqwest::Client::new()
+    pub fn send(&self, config: &Config) -> Result<reqwest::StatusCode, reqwest::Error> {
+        let response = reqwest::Client::new()
             .post(&format!("{}feed/{}", config.host, self.app_id))
-            .header(Accept::json())
-            .json(&vec![self])
+            // .json(vec![self])
+            .json(self)
             .send()?;
-
-        let res = response.text()?;
-        println!("res {:?}", res);
-        Ok(())
+        Ok(response.status())
     }
 }
 

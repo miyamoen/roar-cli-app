@@ -50,10 +50,10 @@ fn run(cmd: Cmd) -> Result<(), CliError> {
         }
         Cmd::App(AppCmd::Send { app_id, title }) => {
             let config = config::read().map_err(|err| CliError::Config(err))?;
-            let app = EntryRequest::new(app_id, title)
+            let status = EntryRequest::new(app_id, title)
                 .send(&config)
                 .map_err(|err| CliError::Reqwest(err))?;
-            println!("Registered : {:?}", app);
+            println!("Response status code : {}", status);
         }
     };
     Ok(())
